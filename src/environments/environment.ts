@@ -1,9 +1,4 @@
 export const environment = {
   production: false,
-  apiUrl: 'https://tasktrack-backend-ongo.onrender.com/api',
+  apiUrl: '/api',
 };
-
-// export const environment = {
-//   production: false,
-//   apiUrl: '/api',
-// };

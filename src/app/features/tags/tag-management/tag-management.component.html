@@ -1,37 +1,34 @@
 <div class="page-header">
   <div>
-    <h1>Tag Management</h1>
-    <p>Create, update and delete tags.</p>
+    <h1>{{ readOnly ? 'Tags' : 'Tag Management' }}</h1>
+    @if (!readOnly) {
+      <p>Create, update and delete tags.</p>
+    }
   </div>
 
-  <button
-    nz-button
-    nzType="primary"
-    (click)="openCreate()">
-    <span nz-icon nzType="plus"></span>
-    Create Tag
-  </button>
+  @if (auth.isAuthenticated() && !readOnly) {
+    <button nz-button nzType="primary" (click)="openCreate()">
+      <span nz-icon nzType="plus"></span>
+      Create Tag
+    </button>
+  }
 </div>
 
-<nz-table
-  #table
-  [nzData]="tags"
-  [nzLoading]="loading"
-  nzBordered>
+<nz-table #table [nzData]="tags" [nzLoading]="loading" nzBordered>
   <thead>
     <tr>
       <th>ID</th>
       <th>Name</th>
       <th>Color Preview</th>
-      <th>Actions</th>
+      @if (auth.isAuthenticated() && !readOnly) {
+        <th>Actions</th>
+      }
     </tr>
   </thead>
   <tbody>
     @for (tag of table.data; track tag.tagID) {
       <tr>
-        <td>
-          {{ tag.tagID }}
-        </td>
+        <td>{{ tag.tagID }}</td>
         <td>
           {{ tag.tagName }}
         </td>
@@ -40,29 +37,21 @@
             <span
               class="color-preview"
               [style.backgroundColor]="tag.color"
-              style="margin-right: 8px;">
+              style="margin-right: 8px"
+            >
             </span>
             <nz-tag [nzColor]="tag.color">{{ tag.tagName }}</nz-tag>
-            <span style="color: #8c8c8c; font-size: 12px; margin-left: 4px;">({{ tag.color }})</span>
+            <span style="color: #8c8c8c; font-size: 12px; margin-left: 4px">({{ tag.color }})</span>
           } @else {
             <nz-tag>{{ tag.tagName }}</nz-tag>
           }
         </td>
-        <td>
-          <button
-            nz-button
-            nzType="link"
-            (click)="openEdit(tag)">
-            Edit
-          </button>
-          <button
-            nz-button
-            nzType="link"
-            nzDanger
-            (click)="confirmDelete(tag)">
-            Delete
-          </button>
-        </td>
+        @if (auth.isAuthenticated() && !readOnly) {
+          <td>
+            <button nz-button nzType="link" (click)="openEdit(tag)">Edit</button>
+            <button nz-button nzType="link" nzDanger (click)="confirmDelete(tag)">Delete</button>
+          </td>
+        }
       </tr>
     }
   </tbody>
@@ -72,37 +61,25 @@
   [(nzVisible)]="modalVisible"
   [nzTitle]="editingId === null ? 'Create Tag' : 'Edit Tag'"
   (nzOnCancel)="closeModal()"
-  (nzOnOk)="submit()">
+  (nzOnOk)="submit()"
+  [nzOkLoading]="isSaving"
+>
   <ng-container *nzModalContent>
-    <form
-      nz-form
-      [formGroup]="form">
+    <form nz-form [formGroup]="form">
       <nz-form-item>
-        <nz-form-label nzRequired>
-          Name
-        </nz-form-label>
+        <nz-form-label nzRequired> Name </nz-form-label>
         <nz-form-control nzErrorTip="Tag name is required.">
-          <input
-            nz-input
-            placeholder="Tag name"
-            formControlName="tagName" />
+          <input nz-input placeholder="Tag name" formControlName="tagName" />
         </nz-form-control>
       </nz-form-item>
 
       <nz-form-item>
-        <nz-form-label>
-          Color
-        </nz-form-label>
+        <nz-form-label> Color </nz-form-label>
         <nz-form-control>
           <div class="color-input-wrapper">
-            <input
-              nz-input
-              placeholder="e.g. #1890ff, blue, green"
-              formControlName="color" />
+            <input nz-input placeholder="e.g. #1890ff, blue, green" formControlName="color" />
             @if (form.controls.color.value) {
-              <span
-                class="color-preview"
-                [style.backgroundColor]="form.controls.color.value">
+              <span class="color-preview" [style.backgroundColor]="form.controls.color.value">
               </span>
               <nz-tag [nzColor]="form.controls.color.value">
                 {{ form.controls.tagName.value || 'Preview' }}

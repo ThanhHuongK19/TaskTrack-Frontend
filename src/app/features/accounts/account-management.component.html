@@ -1,0 +1,71 @@
+<section class="accounts-page">
+  <header class="page-header">
+    <div>
+      <p class="eyebrow">WORKSPACE ACCESS</p>
+      <h1>Accounts</h1>
+      <p>Review roles and access for registered members.</p>
+    </div>
+    <span class="account-count">{{ accounts.length }} members</span>
+  </header>
+
+  <nz-table #table [nzData]="accounts" [nzLoading]="loading" nzSize="middle">
+    <thead>
+      <tr>
+        <th>Account</th>
+        <th>Email</th>
+        <th>Role</th>
+        <th>Created</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (account of table.data; track account.accountId) {
+        <tr>
+          <td class="account-name">{{ account.fullName }}</td>
+          <td>{{ account.email }}</td>
+          <td>
+            <nz-tag [nzColor]="account.role === 1 ? 'gold' : 'green'">{{
+              roleLabel(account.role)
+            }}</nz-tag>
+          </td>
+          <td>{{ account.createdDate | date: 'mediumDate' }}</td>
+          <td class="actions">
+            <button nz-button nzType="link" (click)="openEdit(account)">Edit</button>
+            <button nz-button nzType="link" nzDanger (click)="confirmDelete(account)">
+              Delete
+            </button>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </nz-table>
+</section>
+
+<nz-modal
+  [(nzVisible)]="modalVisible"
+  nzTitle="Edit account"
+  (nzOnCancel)="modalVisible = false"
+  (nzOnOk)="submit()"
+  [nzOkLoading]="isSaving"
+>
+  >
+  <ng-container *nzModalContent>
+    <form nz-form [formGroup]="form" nzLayout="vertical">
+      <nz-form-item>
+        <nz-form-label nzRequired>Full name</nz-form-label>
+        <nz-form-control nzErrorTip="A name is required.">
+          <input nz-input formControlName="fullName" />
+        </nz-form-control>
+      </nz-form-item>
+      <nz-form-item>
+        <nz-form-label nzRequired>Role</nz-form-label>
+        <nz-form-control>
+          <nz-select formControlName="role">
+            <nz-option [nzValue]="0" nzLabel="Staff"></nz-option>
+            <nz-option [nzValue]="1" nzLabel="Admin"></nz-option>
+          </nz-select>
+        </nz-form-control>
+      </nz-form-item>
+    </form>
+  </ng-container>
+</nz-modal>

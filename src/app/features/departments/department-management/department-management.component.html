@@ -1,179 +1,102 @@
 <div class="page-header">
-
   <div>
-    <h1>Department Management</h1>
-    <p>Create, update and delete departments.</p>
+    <h1>{{ readOnly ? 'Departments' : 'Department Management' }}</h1>
+    <p>
+      {{
+        readOnly ? 'Browse departments in the workspace.' : 'Create, update and delete departments.'
+      }}
+    </p>
   </div>
 
-  <button
-    nz-button
-    nzType="primary"
-    (click)="openCreate()">
+  @if (auth.isAuthenticated() && !readOnly) {
+    <button nz-button nzType="primary" (click)="openCreate()">
+      <span nz-icon nzType="plus"></span>
 
-    <span nz-icon nzType="plus"></span>
-
-    Create Department
-
-  </button>
-
+      Create Department
+    </button>
+  }
 </div>
 
-
 <div class="toolbar">
-
   <input
     nz-input
     placeholder="Search department..."
     [(ngModel)]="searchName"
-    (keyup.enter)="search()" />
+    (keyup.enter)="search()"
+  />
 
-  <button
-    nz-button
-    (click)="search()">
-
+  <button nz-button (click)="search()">
     <span nz-icon nzType="search"></span>
 
     Search
-
   </button>
-
 </div>
 
-
-<nz-table
-  #table
-  [nzData]="departments"
-  [nzLoading]="loading"
-  nzBordered>
-
+<nz-table #table [nzData]="departments" [nzLoading]="loading" nzBordered>
   <thead>
-
     <tr>
-
       <th>ID</th>
 
       <th>Name</th>
 
       <th>Description</th>
 
-      <th>Actions</th>
-
+      @if (!readOnly) {
+        <th>Actions</th>
+      }
     </tr>
-
   </thead>
 
   <tbody>
-
-    @for (
-      department of table.data;
-      track department.departmentID
-    ) {
-
+    @for (department of table.data; track department.departmentID) {
       <tr>
-
-        <td>
-          {{ department.departmentID }}
-        </td>
+        <td>{{ department.departmentID }}</td>
 
         <td>
           {{ department.departmentName }}
         </td>
 
         <td>
-          {{
-            department.departmentDescription
-            || '-'
-          }}
+          {{ department.departmentDescription || '-' }}
         </td>
 
-        <td>
-
-          <button
-            nz-button
-            nzType="link"
-            (click)="openEdit(department)">
-
-            Edit
-
-          </button>
-
-
-          <button
-            nz-button
-            nzType="link"
-            nzDanger
-            (click)="confirmDelete(department)">
-
-            Delete
-
-          </button>
-
-        </td>
-
+        @if (!readOnly) {
+          <td>
+            <button nz-button nzType="link" (click)="openEdit(department)">Edit</button>
+            <button nz-button nzType="link" nzDanger (click)="confirmDelete(department)">
+              Delete
+            </button>
+          </td>
+        }
       </tr>
-
     }
-
   </tbody>
-
 </nz-table>
-
 
 <nz-modal
   [(nzVisible)]="modalVisible"
-  [nzTitle]="
-    editingId === null
-      ? 'Create Department'
-      : 'Edit Department'
-  "
+  [nzTitle]="editingId === null ? 'Create Department' : 'Edit Department'"
   (nzOnCancel)="closeModal()"
-  (nzOnOk)="submit()">
-
+  (nzOnOk)="submit()"
+  [nzOkLoading]="isSaving"
+>
   <ng-container *nzModalContent>
-
-    <form
-      nz-form
-      [formGroup]="form">
-
+    <form nz-form [formGroup]="form">
       <nz-form-item>
+        <nz-form-label nzRequired> Name </nz-form-label>
 
-        <nz-form-label
-          nzRequired>
-          Name
-        </nz-form-label>
-
-        <nz-form-control
-          nzErrorTip="Department name is required.">
-
-          <input
-            nz-input
-            formControlName="departmentName" />
-
+        <nz-form-control nzErrorTip="Department name is required.">
+          <input nz-input formControlName="departmentName" />
         </nz-form-control>
-
       </nz-form-item>
 
-
       <nz-form-item>
-
-        <nz-form-label>
-          Description
-        </nz-form-label>
+        <nz-form-label> Description </nz-form-label>
 
         <nz-form-control>
-
-          <textarea
-            nz-input
-            rows="4"
-            formControlName="departmentDescription">
-          </textarea>
-
+          <textarea nz-input rows="4" formControlName="departmentDescription"> </textarea>
         </nz-form-control>
-
       </nz-form-item>
-
     </form>
-
   </ng-container>
-
 </nz-modal>

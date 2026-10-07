@@ -11,8 +11,11 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { DepartmentService } from '../../../core/services/department.service';
 import { Department, DepartmentRequest } from '../../../core/models/department.model';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-department-management',
@@ -41,10 +44,14 @@ export class DepartmentManagementComponent implements OnInit {
   private readonly notification = inject(NzNotificationService);
 
   private readonly changeDetector = inject(ChangeDetectorRef);
+  readonly auth = inject(AuthService);
+  readonly readOnly = inject(ActivatedRoute).snapshot.data['readOnly'] === true;
 
   departments: Department[] = [];
 
   loading = false;
+
+  isSaving = false;
 
   modalVisible = false;
 
@@ -142,33 +149,23 @@ export class DepartmentManagementComponent implements OnInit {
 
     const request: DepartmentRequest = this.form.getRawValue();
 
-    if (this.editingId === null) {
-      this.service.create(request).subscribe({
-        next: () => {
-          this.notification.success('Success', 'Department created successfully.');
-
-          this.closeModal();
-          this.loadDepartments();
-        },
-
-        error: () => {
-          this.notification.error('Error', 'Unable to create department.');
-        },
-      });
-    } else {
-      this.service.update(this.editingId, request).subscribe({
-        next: () => {
-          this.notification.success('Success', 'Department updated successfully.');
-
-          this.closeModal();
-          this.loadDepartments();
-        },
-
-        error: () => {
-          this.notification.error('Error', 'Unable to update department.');
-        },
-      });
-    }
+    this.isSaving = true;
+    const operation =
+      this.editingId === null
+        ? this.service.create(request)
+        : this.service.update(this.editingId, request);
+    operation.subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.notification.success('Success', 'Department saved successfully.');
+        this.closeModal();
+        this.loadDepartments();
+      },
+      error: (response: HttpErrorResponse) => {
+        this.isSaving = false;
+        this.notification.error('Error', response.error?.message ?? 'Unable to save department.');
+      },
+    });
   }
 
   confirmDelete(department: Department): void {

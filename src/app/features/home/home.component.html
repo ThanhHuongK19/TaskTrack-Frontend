@@ -1,303 +1,179 @@
 @if (loading) {
-
   <div class="loading-container">
-
-    <nz-spin
-      nzSimple
-      nzSize="large">
-    </nz-spin>
+    <nz-spin nzSimple nzSize="large"> </nz-spin>
 
     <p>Loading dashboard...</p>
-
   </div>
-
-}
-@else if (errorMessage) {
-
-  <nz-alert
-    nzType="error"
-    nzShowIcon
-    [nzMessage]="errorMessage">
-  </nz-alert>
-
-}
-@else {
-
+} @else if (errorMessage) {
+  <nz-alert nzType="error" nzShowIcon [nzMessage]="errorMessage"> </nz-alert>
+} @else {
   <!-- Welcome -->
   <section class="welcome-section">
-
     <div class="welcome-content">
-
       <div>
+        <p class="welcome-label">TASKTRACK</p>
 
-        <p class="welcome-label">
-          TASKTRACK
-        </p>
+        <h1>Welcome to TaskTrack</h1>
 
-        <h1>
-          Welcome to TaskTrack
-        </h1>
-
-        <p class="welcome-description">
-          Manage your departments, projects and tasks
-          in one place.
-        </p>
-
+        <p class="welcome-description">Manage your departments, projects and tasks in one place.</p>
       </div>
 
-      <span
-        nz-icon
-        nzType="check-circle"
-        nzTheme="outline"
-        class="welcome-icon">
-      </span>
-
+      <span nz-icon nzType="check-circle" nzTheme="outline" class="welcome-icon"> </span>
     </div>
-
   </section>
-
 
   <!-- Summary -->
   <section class="summary-section">
-
     <div class="section-title">
-
       <h2>Overview</h2>
 
-      <span>
-        Current active data
-      </span>
-
+      <span> Current active data </span>
     </div>
 
-
     <div class="summary-grid">
-
       <!-- Departments -->
       <nz-card class="summary-card">
-
         <div class="summary-card-content">
-
           <div class="summary-icon department-icon">
-
-            <span
-              nz-icon
-              nzType="apartment">
-            </span>
-
+            <span nz-icon nzType="apartment"> </span>
           </div>
 
           <div>
-
-            <p class="summary-label">
-              Departments
-            </p>
+            <p class="summary-label">Departments</p>
 
             <p class="summary-value">
               {{ departmentsCount }}
             </p>
-
           </div>
-
         </div>
-
       </nz-card>
 
+      <nz-card class="summary-card">
+        <div class="summary-card-content">
+          <div class="summary-icon tag-icon">
+            <span nz-icon nzType="tags"></span>
+          </div>
+          <div>
+            <p class="summary-label">Tags</p>
+            <p class="summary-value">{{ tagsCount }}</p>
+          </div>
+        </div>
+      </nz-card>
 
       <!-- Projects -->
       <nz-card class="summary-card">
-
         <div class="summary-card-content">
-
           <div class="summary-icon project-icon">
-
-            <span
-              nz-icon
-              nzType="project">
-            </span>
-
+            <span nz-icon nzType="project"> </span>
           </div>
 
           <div>
-
-            <p class="summary-label">
-              Projects
-            </p>
+            <p class="summary-label">Projects</p>
 
             <p class="summary-value">
               {{ projectsCount }}
             </p>
-
           </div>
-
         </div>
-
       </nz-card>
-
 
       <!-- Tasks -->
       <nz-card class="summary-card">
-
         <div class="summary-card-content">
-
           <div class="summary-icon task-icon">
-
-            <span
-              nz-icon
-              nzType="check-square">
-            </span>
-
+            <span nz-icon nzType="check-square"> </span>
           </div>
 
           <div>
-
-            <p class="summary-label">
-              Tasks
-            </p>
+            <p class="summary-label">Tasks</p>
 
             <p class="summary-value">
               {{ tasksCount }}
             </p>
-
           </div>
-
         </div>
-
       </nz-card>
-
     </div>
-
   </section>
 
+  @if (auth.isLoggedIn()) {
+    <section class="admin-shortcuts" aria-label="Workspace management">
+      <div class="section-title">
+        <h2>Manage workspace</h2>
+        <span>Administration</span>
+      </div>
+      <nav class="shortcut-links">
+        <a routerLink="/admin/departments"><span nz-icon nzType="apartment"></span>Departments</a>
+        <a routerLink="/admin/projects"><span nz-icon nzType="project"></span>Projects</a>
+        <a routerLink="/admin/tasks"><span nz-icon nzType="check-square"></span>Tasks</a>
+        <a routerLink="/admin/tags"><span nz-icon nzType="tags"></span>Tags</a>
+        @if (auth.isAdmin()) {
+          <a routerLink="/admin/accounts"><span nz-icon nzType="team"></span>Accounts</a>
+        }
+      </nav>
+    </section>
+  }
 
   <!-- Active Projects -->
   <section class="projects-section">
-
     <div class="section-title">
-
       <div>
-
         <h2>Active Projects</h2>
 
-        <span>
-          Current projects in TaskTrack
-        </span>
-
+        <span> Current projects in TaskTrack </span>
       </div>
-
     </div>
 
-
     @if (projects.length === 0) {
-
       <nz-card>
-
         <div class="empty-state">
+          <span nz-icon nzType="project"> </span>
 
-          <span
-            nz-icon
-            nzType="project">
-          </span>
-
-          <p>
-            No active projects found.
-          </p>
-
+          <p>No active projects found.</p>
         </div>
-
       </nz-card>
-
-    }
-    @else {
-
+    } @else {
       <div class="project-grid">
-
-        @for (
-          project of projects;
-          track project.projectID
-        ) {
-
-          <nz-card
-            class="project-card"
-            [nzHoverable]="true">
-
+        @for (project of projects; track project.projectID) {
+          <nz-card class="project-card" [nzHoverable]="true">
             <div class="project-card-header">
-
               <h3>
                 {{ project.projectName }}
               </h3>
 
-              <nz-tag
-                [nzColor]="
-                  getProjectStatusColor(project.status)
-                ">
-
-                {{
-                  getProjectStatusLabel(
-                    project.status
-                  )
-                }}
-
+              <nz-tag [nzColor]="getProjectStatusColor(project.status)">
+                {{ getProjectStatusLabel(project.status) }}
               </nz-tag>
-
             </div>
 
-
             <p class="project-description">
-
               @if (project.description) {
-
                 {{ project.description }}
-
-              }
-              @else {
-
+              } @else {
                 No description available.
-
               }
-
             </p>
 
-
             <div class="project-info">
-
               <div>
-
-                <span
-                  nz-icon
-                  nzType="apartment">
-                </span>
+                <span nz-icon nzType="apartment"> </span>
 
                 <span>
                   {{ project.departmentName || 'No department' }}
                 </span>
-
               </div>
-
 
               <div>
-
-                <span
-                  nz-icon
-                  nzType="calendar">
-                </span>
+                <span nz-icon nzType="calendar"> </span>
 
                 <span>
-                  {{ project.startDate | date:'mediumDate' }}
+                  {{ project.startDate | date: 'mediumDate' }}
                 </span>
-
               </div>
-
             </div>
-
           </nz-card>
-
         }
-
       </div>
-
     }
-
   </section>
-
 }

@@ -1,4 +1,6 @@
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
@@ -14,6 +16,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { TagService } from '../../../core/services/tag.service';
 import { Tag, TagRequest } from '../../../core/models/tag.model';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-tag-management',
@@ -38,9 +41,12 @@ export class TagManagementComponent implements OnInit {
   private readonly modal = inject(NzModalService);
   private readonly notification = inject(NzNotificationService);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  readonly auth = inject(AuthService);
+  readonly readOnly = inject(ActivatedRoute).snapshot.data['readOnly'] === true;
 
   tags: Tag[] = [];
   loading = false;
+  isSaving = false;
   modalVisible = false;
   editingId: number | null = null;
 
@@ -104,29 +110,23 @@ export class TagManagementComponent implements OnInit {
       color: raw.color.trim() ? raw.color.trim() : undefined,
     };
 
-    if (this.editingId === null) {
-      this.service.create(request).subscribe({
-        next: () => {
-          this.notification.success('Success', 'Tag created successfully.');
-          this.closeModal();
-          this.loadTags();
-        },
-        error: () => {
-          this.notification.error('Error', 'Unable to create tag.');
-        },
-      });
-    } else {
-      this.service.update(this.editingId, request).subscribe({
-        next: () => {
-          this.notification.success('Success', 'Tag updated successfully.');
-          this.closeModal();
-          this.loadTags();
-        },
-        error: () => {
-          this.notification.error('Error', 'Unable to update tag.');
-        },
-      });
-    }
+    this.isSaving = true;
+    const operation =
+      this.editingId === null
+        ? this.service.create(request)
+        : this.service.update(this.editingId, request);
+    operation.subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.notification.success('Success', 'Tag saved successfully.');
+        this.closeModal();
+        this.loadTags();
+      },
+      error: (response: HttpErrorResponse) => {
+        this.isSaving = false;
+        this.notification.error('Error', response.error?.message ?? 'Unable to save tag.');
+      },
+    });
   }
 
   confirmDelete(tag: Tag): void {

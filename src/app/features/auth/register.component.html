@@ -1,0 +1,65 @@
+<main class="auth-page">
+  <section class="auth-panel">
+    <a routerLink="/" class="auth-brand">TaskTrack <span>Workspace</span></a>
+    <p class="auth-kicker">STAFF REGISTRATION</p>
+    <h1>Create your account</h1>
+    <p class="auth-copy">Join the workspace and start tracking work.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <label for="fullName">Full name</label>
+      <input id="fullName" nz-input formControlName="fullName" autocomplete="name" />
+      @if (form.controls.fullName.touched && form.controls.fullName.invalid) {
+        <small>Enter your name.</small>
+      }
+
+      <label for="email">Email</label>
+      <input id="email" nz-input type="email" formControlName="email" autocomplete="email" />
+      @if (form.controls.email.touched && form.controls.email.invalid) {
+        <small>Enter a valid email address.</small>
+      }
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        nz-input
+        type="password"
+        formControlName="password"
+        autocomplete="new-password"
+      />
+      @if (form.controls.password.touched && form.controls.password.invalid) {
+        <small>Use 8 to 72 characters.</small>
+      }
+      <label for="confirmPassword">Confirm password</label>
+      <input
+        id="confirmPassword"
+        nz-input
+        type="password"
+        formControlName="confirmPassword"
+        autocomplete="new-password"
+      />
+      @if (
+        form.controls.confirmPassword.touched && form.controls.confirmPassword.hasError('required')
+      ) {
+        <small>Confirm your password.</small>
+      }
+      @if (form.controls.confirmPassword.touched && form.hasError('passwordMismatch')) {
+        <small>Passwords do not match.</small>
+      }
+      @if (error) {
+        <p class="form-error" role="alert">{{ error }}</p>
+      }
+
+      <button nz-button nzType="primary" type="submit" [nzLoading]="loading">Create account</button>
+    </form>
+
+    <p class="auth-switch">Already registered? <a routerLink="/login">Sign in</a></p>
+  </section>
+  <aside class="auth-side" aria-hidden="true">
+    <div class="side-mark">TT<span>/</span>02</div>
+    <div class="side-copy">
+      <p>ONE TEAM, SHARED FOCUS</p>
+      <h2>Turn plans<br />into progress,<br />together.</h2>
+    </div>
+    <div class="side-foot">TASKTRACK · PROJECT OPERATIONS</div>
+  </aside>
+</main>

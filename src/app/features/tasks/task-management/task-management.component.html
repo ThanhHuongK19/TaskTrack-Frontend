@@ -1,24 +1,42 @@
 <nz-card>
   <div class="page-header">
-    <h2>Task Management</h2>
-    <button nz-button nzType="primary" (click)="showCreateModal()">
-      <nz-icon nzType="plus" /> Add Task
-    </button>
+    <h2>{{ readOnly ? 'Tasks' : 'Task Management' }}</h2>
+    @if (auth.isAuthenticated() && !readOnly) {
+      <button nz-button nzType="primary" (click)="showCreateModal()">
+        <nz-icon nzType="plus" /> Add Task
+      </button>
+    }
   </div>
 
   <div class="toolbar">
     <nz-input-group nzPrefixIcon="search">
-      <input type="text" nz-input placeholder="Search by title" [(ngModel)]="searchTitle" (keyup.enter)="onSearch()" />
+      <input
+        type="text"
+        nz-input
+        placeholder="Search by title"
+        [(ngModel)]="searchTitle"
+        (keyup.enter)="onSearch()"
+      />
     </nz-input-group>
 
-    <nz-select nzAllowClear nzPlaceHolder="Select Status" [(ngModel)]="searchStatus" (ngModelChange)="onSearch()">
+    <nz-select
+      nzAllowClear
+      nzPlaceHolder="Select Status"
+      [(ngModel)]="searchStatus"
+      (ngModelChange)="onSearch()"
+    >
       <nz-option [nzValue]="TaskStatus.ToDo" nzLabel="To Do"></nz-option>
       <nz-option [nzValue]="TaskStatus.InProgress" nzLabel="In Progress"></nz-option>
       <nz-option [nzValue]="TaskStatus.Done" nzLabel="Done"></nz-option>
       <nz-option [nzValue]="TaskStatus.Cancelled" nzLabel="Cancelled"></nz-option>
     </nz-select>
 
-    <nz-select nzAllowClear nzPlaceHolder="Select Priority" [(ngModel)]="searchPriority" (ngModelChange)="onSearch()">
+    <nz-select
+      nzAllowClear
+      nzPlaceHolder="Select Priority"
+      [(ngModel)]="searchPriority"
+      (ngModelChange)="onSearch()"
+    >
       <nz-option [nzValue]="TaskPriority.Low" nzLabel="Low"></nz-option>
       <nz-option [nzValue]="TaskPriority.Medium" nzLabel="Medium"></nz-option>
       <nz-option [nzValue]="TaskPriority.High" nzLabel="High"></nz-option>
@@ -38,34 +56,44 @@
         <th>Priority</th>
         <th>Due Date</th>
         <th>Tags</th>
-        <th>Actions</th>
+        @if (auth.isAuthenticated() && !readOnly) {
+          <th>Actions</th>
+        }
       </tr>
     </thead>
     <tbody>
       @for (data of basicTable.data; track data.taskID) {
         <tr>
           <td>{{ data.taskID }}</td>
-          <td>{{ data.title }}</td>
+          <td>
+            <a [routerLink]="['/tasks', data.taskID]">{{ data.title }}</a>
+          </td>
           <td>{{ data.projectName }}</td>
           <td>
-            <nz-tag [nzColor]="getStatusColor(data.status)">{{ getStatusText(data.status) }}</nz-tag>
+            <nz-tag [nzColor]="getStatusColor(data.status)">{{
+              getStatusText(data.status)
+            }}</nz-tag>
           </td>
           <td>
-            <nz-tag [nzColor]="getPriorityColor(data.priority)">{{ getPriorityText(data.priority) }}</nz-tag>
+            <nz-tag [nzColor]="getPriorityColor(data.priority)">{{
+              getPriorityText(data.priority)
+            }}</nz-tag>
           </td>
-          <td>{{ data.dueDate | date:'mediumDate' }}</td>
+          <td>{{ data.dueDate | date: 'mediumDate' }}</td>
           <td>
             @for (tag of data.tags; track tag.tagID) {
               <nz-tag [nzColor]="tag.color || 'default'">{{ tag.tagName }}</nz-tag>
             }
           </td>
-          <td>
-            <a [routerLink]="['/tasks', data.taskID]">View</a>
-            <nz-divider nzType="vertical"></nz-divider>
-            <a (click)="showEditModal(data)">Edit</a>
-            <nz-divider nzType="vertical"></nz-divider>
-            <a class="text-danger" (click)="showDeleteConfirm(data.taskID)">Delete</a>
-          </td>
+          @if (auth.isAuthenticated() && !readOnly) {
+            <td>
+              <a [routerLink]="['/tasks', data.taskID]">View</a>
+              <nz-divider nzType="vertical"></nz-divider>
+              <a (click)="showEditModal(data)">Edit</a>
+              <nz-divider nzType="vertical"></nz-divider>
+              <a class="text-danger" (click)="showDeleteConfirm(data.taskID)">Delete</a>
+            </td>
+          }
         </tr>
       }
     </tbody>
@@ -102,7 +130,13 @@
       <nz-form-item>
         <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="description">Description</nz-form-label>
         <nz-form-control [nzSm]="14" [nzXs]="24">
-          <textarea nz-input id="description" formControlName="description" placeholder="Enter description" [nzAutosize]="{ minRows: 2, maxRows: 6 }"></textarea>
+          <textarea
+            nz-input
+            id="description"
+            formControlName="description"
+            placeholder="Enter description"
+            [nzAutosize]="{ minRows: 2, maxRows: 6 }"
+          ></textarea>
         </nz-form-control>
       </nz-form-item>
 
@@ -140,7 +174,12 @@
       <nz-form-item>
         <nz-form-label [nzSm]="6" [nzXs]="24" nzFor="tagIDs">Tags</nz-form-label>
         <nz-form-control [nzSm]="14" [nzXs]="24">
-          <nz-select id="tagIDs" formControlName="tagIDs" nzMode="multiple" nzPlaceHolder="Select tags">
+          <nz-select
+            id="tagIDs"
+            formControlName="tagIDs"
+            nzMode="multiple"
+            nzPlaceHolder="Select tags"
+          >
             @for (tag of tags; track tag.tagID) {
               <nz-option [nzValue]="tag.tagID" [nzLabel]="tag.tagName"></nz-option>
             }

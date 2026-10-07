@@ -7,6 +7,7 @@ import {
   Validators,
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 
 // ng-zorro-antd
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -32,6 +33,7 @@ import { Tag } from '../../../core/models/tag.model';
 import { TaskService } from '../../../core/services/task.service';
 import { ProjectService } from '../../../core/services/project.service';
 import { TagService } from '../../../core/services/tag.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-task-management',
@@ -67,6 +69,8 @@ export class TaskManagementComponent implements OnInit {
   private modal = inject(NzModalService);
   private datePipe = inject(DatePipe);
   private changeDetector = inject(ChangeDetectorRef);
+  readonly auth = inject(AuthService);
+  readonly readOnly = inject(ActivatedRoute).snapshot.data['readOnly'] === true;
 
   tasks: Task[] = [];
   projects: Project[] = [];

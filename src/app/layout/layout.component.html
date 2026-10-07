@@ -1,139 +1,90 @@
 <nz-layout class="app-layout">
-
   <!-- Navbar -->
   <nz-header class="app-header">
-
     <div class="header-container">
-
       <!-- Logo -->
-      <a
-        routerLink="/"
-        class="logo">
-
-        <span
-          nz-icon
-          nzType="check-circle"
-          nzTheme="fill">
-        </span>
+      <a routerLink="/" class="logo">
+        <span nz-icon nzType="check-circle" nzTheme="fill"> </span>
 
         <span>TaskTrack</span>
-
       </a>
-
 
       <!-- Navigation -->
       <nav class="navigation">
-
-        <a
-          routerLink="/"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }">
-
-          <span
-            nz-icon
-            nzType="home">
-          </span>
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+          <span nz-icon nzType="home"> </span>
 
           <span>Home</span>
-
         </a>
 
-
         <a
-          routerLink="/departments"
-          routerLinkActive="active">
-
-          <span
-            nz-icon
-            nzType="apartment">
-          </span>
+          [routerLink]="auth.isLoggedIn() ? '/admin/departments' : '/departments'"
+          routerLinkActive="active"
+        >
+          <span nz-icon nzType="apartment"> </span>
 
           <span>Departments</span>
-
         </a>
 
-
         <a
-          routerLink="/projects"
-          routerLinkActive="active">
-
-          <span
-            nz-icon
-            nzType="project">
-          </span>
-
+          [routerLink]="auth.isLoggedIn() ? '/admin/projects' : '/projects'"
+          routerLinkActive="active"
+        >
+          <span nz-icon nzType="project"></span>
           <span>Projects</span>
-
         </a>
-
-
-        <a
-          routerLink="/tasks"
-          routerLinkActive="active">
-
-          <span
-            nz-icon
-            nzType="check-square">
-          </span>
-
+        <a [routerLink]="auth.isLoggedIn() ? '/admin/tasks' : '/tasks'" routerLinkActive="active">
+          <span nz-icon nzType="check-square"></span>
           <span>Tasks</span>
-
         </a>
-
-
-        <a
-          routerLink="/tags"
-          routerLinkActive="active">
-
-          <span
-            nz-icon
-            nzType="tags">
-          </span>
-
+        <a [routerLink]="auth.isLoggedIn() ? '/admin/tags' : '/tags'" routerLinkActive="active">
+          <span nz-icon nzType="tags"></span>
           <span>Tags</span>
-
         </a>
 
-
-        <a
-          routerLink="/search"
-          routerLinkActive="active">
-
-          <span
-            nz-icon
-            nzType="search">
-          </span>
+        <a routerLink="/search" routerLinkActive="active">
+          <span nz-icon nzType="search"> </span>
 
           <span>Search</span>
-
         </a>
 
+        @if (auth.isAdmin()) {
+          <a routerLink="/admin/accounts" routerLinkActive="active">
+            <span nz-icon nzType="team"></span>
+            <span>Accounts</span>
+          </a>
+        }
       </nav>
 
+      <div class="auth-controls">
+        @if (auth.isAuthenticated()) {
+          @if (auth.currentAccount(); as account) {
+            <span class="signed-in-name">{{ account.fullName }}</span>
+          }
+          @if (auth.isAdmin()) {
+            <span class="role-label">Admin</span>
+          }
+          <button nz-button nzType="default" class="logout-button" (click)="signOut()">
+            <span nz-icon nzType="logout"></span>
+            Logout
+          </button>
+        } @else {
+          <a routerLink="/login">Sign in</a>
+          <a routerLink="/register" class="register-link">Register</a>
+        }
+      </div>
     </div>
-
   </nz-header>
-
 
   <!-- Main -->
   <nz-content class="app-content">
-
     <main class="content-container">
-
       <router-outlet />
-
     </main>
-
   </nz-content>
-
 
   <!-- Footer -->
   <nz-footer class="app-footer">
-
-    <span>
-      TaskTrack © 2026
-    </span>
-
+    <span> TaskTrack © 2026 </span>
   </nz-footer>
-
 </nz-layout>

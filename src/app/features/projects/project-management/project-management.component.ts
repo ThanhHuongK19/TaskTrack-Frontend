@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { CommonModule, DatePipe, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 
 import { NzTableModule } from 'ng-zorro-antd/table';
@@ -25,6 +26,7 @@ import {
 import { ProjectService } from '../../../core/services/project.service';
 import { Department } from '../../../core/models/department.model';
 import { DepartmentService } from '../../../core/services/department.service';
+import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
   selector: 'app-project-management',
@@ -58,6 +60,8 @@ export class ProjectManagementComponent implements OnInit {
   private modal = inject(NzModalService);
   private platformId = inject(PLATFORM_ID);
   private changeDetector = inject(ChangeDetectorRef);
+  readonly auth = inject(AuthService);
+  readonly readOnly = inject(ActivatedRoute).snapshot.data['readOnly'] === true;
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {

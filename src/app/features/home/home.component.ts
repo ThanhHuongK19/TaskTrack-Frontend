@@ -8,12 +8,15 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { RouterLink } from '@angular/router';
 
 import { DepartmentService } from '../../core/services/department.service';
 
 import { ProjectService } from '../../core/services/project.service';
 
 import { TaskService } from '../../core/services/task.service';
+import { TagService } from '../../core/services/tag.service';
+import { AuthService } from '../../core/services/auth.service';
 
 import { Project, ProjectStatus } from '../../core/models/project.model';
 
@@ -21,7 +24,15 @@ import { Project, ProjectStatus } from '../../core/models/project.model';
   selector: 'app-home',
   standalone: true,
 
-  imports: [DatePipe, NzAlertModule, NzCardModule, NzIconModule, NzSpinModule, NzTagModule],
+  imports: [
+    DatePipe,
+    RouterLink,
+    NzAlertModule,
+    NzCardModule,
+    NzIconModule,
+    NzSpinModule,
+    NzTagModule,
+  ],
 
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
@@ -33,6 +44,10 @@ export class HomeComponent implements OnInit {
 
   private readonly taskService = inject(TaskService);
 
+  private readonly tagService = inject(TagService);
+
+  readonly auth = inject(AuthService);
+
   private readonly platformId = inject(PLATFORM_ID);
 
   private readonly changeDetector = inject(ChangeDetectorRef);
@@ -42,6 +57,8 @@ export class HomeComponent implements OnInit {
   projectsCount = 0;
 
   tasksCount = 0;
+
+  tagsCount = 0;
 
   projects: Project[] = [];
 
@@ -66,13 +83,16 @@ export class HomeComponent implements OnInit {
       projects: this.projectService.getAll(),
 
       tasks: this.taskService.getAll(),
+      tags: this.tagService.getAll(),
     }).subscribe({
-      next: ({ departments, projects, tasks }) => {
+      next: ({ departments, projects, tasks, tags }) => {
         this.departmentsCount = departments.length;
 
         this.projectsCount = projects.length;
 
         this.tasksCount = tasks.length;
+
+        this.tagsCount = tags.length;
 
         this.projects = projects;
 
